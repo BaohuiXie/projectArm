@@ -34,7 +34,7 @@ void loop()
     analogWrite(E2, value);   //PWM Speed Control
     sensorValue = analogRead(sensorPin);            // reads the value of the potentiometer (value between 0 and 1023)
     Serial.println(sensorValue);
-    sensorValue = map(sensorValue, 0, 1023, 0, 255);     // scale it to use it with the servo (value between 0 and 180)
+    sensorValue = map(sensorValue, 0, 1023, 0, 180);     // scale it to use it with the servo (value between 0 and 180)
     
     Serial.read(sensorValue);                           // detect the sensor initial value and print it out
     Serial.println(sensorValue);
@@ -43,13 +43,13 @@ void loop()
     
     Serial.print(" Please enter the shoulder angle.");
     
-   if(Serial.available()){
+    if(Serial.available()){
          userAngle1 = Serial.read();}                  // Returnn The first byte of incoming serial data available (or -1 if no data is available). Data type: int.
     validityTest = userAngle1+sensorValue;
     if (validityTest > 180){                            // sensor plus user input check
         Serial.print(" exceed maximum angle avaiable.")};
   
-  
+    
   
     Serial.println(sensorValue);
     myservo.write(sensorValue);                  // sets the servo position according to the scaled value
