@@ -56,4 +56,4 @@ void loop()
     delay(sensorValue);                           // waits for the servo to get there
  // }
 }
-http://inmoov.fr/default-hardware-map/
+
