@@ -41,7 +41,9 @@ void loop()
         Serial.print(" arm angle illegal.")}; 
     
     Serial.print(" Please enter the shoulder angle.");
-    userAngle1 = Serial.read();                         // Returnn The first byte of incoming serial data available (or -1 if no data is available). Data type: int.
+    
+   if(Serial.available()){
+         userAngle1 = Serial.read();}                  // Returnn The first byte of incoming serial data available (or -1 if no data is available). Data type: int.
     validityTest = userAngle1+sensorValue;
     if (validityTest > 180){                            // sensor plus user input check
         Serial.print(" exceed maximum angle avaiable.")};
