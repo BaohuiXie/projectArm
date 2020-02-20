@@ -36,7 +36,8 @@ void loop()
     Serial.println(sensorValue);
     sensorValue = map(sensorValue, 0, 1023, 0, 255);     // scale it to use it with the servo (value between 0 and 180)
     
-  
+    Serial.read(sensorValue);                           // detect the sensor initial value and print it out
+    Serial.println(sensorValue);
     if (sensorValue > 180){                             //sensor initial check
         Serial.print(" arm angle illegal.")}; 
     
