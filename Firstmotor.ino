@@ -38,4 +38,3 @@ void loop()
     delay(sensorValue);                           // waits for the servo to get there
  // }
 }
-你个大JB
