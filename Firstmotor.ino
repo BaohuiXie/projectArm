@@ -33,6 +33,19 @@ void loop()
     sensorValue = analogRead(sensorPin);            // reads the value of the potentiometer (value between 0 and 1023)
     Serial.println(sensorValue);
     sensorValue = map(sensorValue, 0, 1023, 0, 255);     // scale it to use it with the servo (value between 0 and 180)
+    
+  
+    if (sensorValue > 180){                             //sensor initial check
+        Serial.print(" arm angle illegal.")}; 
+    
+    Serial.print(" Please enter the shoulder angle.");
+    userAngle1 = Serial.read();
+    validityTest = userAngle1+sensorValue;
+    if (validityTest > 180){                            // sensor plus user input check
+        Serial.print(" exceed maximum angle avaiable.")};
+  
+  
+  
     Serial.println(sensorValue);
     myservo.write(sensorValue);                  // sets the servo position according to the scaled value
     delay(sensorValue);                           // waits for the servo to get there
