@@ -14,6 +14,8 @@ int E2 = 5;
 int M2 = 4;
 int sensorPin=2 ;//select the input pin for potentiometer
 int sensorValue;
+int userAngle1=0;
+int validityTest=0;
 
 void setup() {
   myservo.attach(sensorPin);  // attaches the servo to the servo object
