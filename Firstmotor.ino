@@ -1,73 +1,125 @@
-// #        M1 pin  -> Digital pin 4
-// #        E1 pin  -> Digital pin 5
-// #        M2 pin  -> Digital pin 7
-// #        E2 pin  -> Digital pin 6
-// #        Motor A  ->  Screw terminal close to E1 driver pin
-// #        Motor B  ->  Screw terminal close to E2 driver pin
-// #        VD: Power Supply 6.5V~12V; VS: Motor Power Supply 4.8～46V; 
+//userInput value
+int userInputAngle1=0;
 
-int E1 = 6; //Inittial the output pin
-int M1 = 7;
-int E2 = 5;
-int M2 = 4;
-int sensorValue;
-int userAngle1;
-int validityTest;
+//configuration for H bridge (controlling direction)
+int In1=7;
+int In2=8;
+
+//-------------------------------------------------------------------------------------------------------------
+//configuration for speed control(to servo)
+int servo1PIN = 2; // Control pin for servo motor, usually yellow wire to the servo
+int minPulseTime = 500; // minimum servo pulse time
+int maxPulseTime = 2400; // maximum servo pulse time
+int pulseTime = 0; // Amount of time to pulse the servo
+long lastPulse = 0; // the time in milliseconds of the last pulse
+int refreshTime = 20; // the time needed in between pulses in milliseconds
+//---------------------// servos have 50Hz rate, 1sec/50 = 20 milliseconds-----------
+int sensorValue = 0; // the value returned from the analog sensor, between 0 and 1023
+int analog1INPUTPIN = A0; // the analog pin that the sensor is on
+
 
 void setup() {
-  pinMode (M1, OUTPUT);
-  pinMode (M2, OUTPUT);
-  pinMode (A0,INPUT);   //select the input pin for potentiometer
-  Serial.begin(9600);   //start communication at 9600 baud
+    pinMode(In1,OUTPUT);  //HIGH: LOW:
+    pinMode(In2,OUTPUT);  //HIGH: LOW:
+    pinMode (A0,INPUT);   //select the input pin for potentiometer
+    Serial.begin(9600);   //start communication at 9600 baud
+
+    //Speed controlling setput
+    pinMode(servo1PIN, OUTPUT); // Set servo pin as an output pin
+    pulseTime = minPulseTime; // Set the motor position value to the minimum
+    Serial.begin(9600); // Set up the serial connection for printing
 }
 
-void loop() 
-{
-  int value=155;
- // for(value=0;value<=255;value+=5)
- // {
-    digitalWrite(M1,HIGH);
-    digitalWrite(M2,HIGH);
-    analogWrite(E1, value);   //PWM Speed Control
-    analogWrite(E2, value);   //PWM Speed Control
-    sensorValue = analogRead(A0);            // reads the value of the potentiometer (value between 0 and 1023)
-    Serial.print("This is Sensor value");
-    sensorValue = map(sensorValue, 0, 1023, 0, 255);     // scale it to use it with the servo (value between 0 and 180)
-    Serial.println(sensorValue);
+//void loop() {
+//    //SPEED controlling part
+//    sensorValue = analogRead(analog1INPUTPIN); // read the analog input
+//    pulseTime = map(sensorValue,0,1023,minPulseTime,maxPulseTime); // convert the analog value to a range between minPulse and maxPulse.
+//    //pulse the servo again if the refresh time (20 ms) have passed:
+//    if (millis() - lastPulse >= refreshTime) {
+//        digitalWrite(In1,HIGH);
+//        digitalWrite(In2,LOW); 
+//    
+//        digitalWrite(servo1PIN, HIGH); // turn on pulse to the servo
+//        delayMicroseconds(pulseTime); // length of the pulse sets the motor position
+//        digitalWrite(servo1PIN, LOW); // stop pulse to the servo
+//        lastPulse = millis(); // save the time of the last pulse
+//    }
+//    Serial.println(sensorValue);
+//    Serial.println(pulseTime);
 
-    if (sensorValue > 191) //(180/240)=(X/255)counterclockwise to the max=0 degree
-    {                             //sensor initial check
+    //direction controlling part
+   
+//    sensorValue = analogRead(A0);            // reads the value of the potentiometer (value between 0 and 1023)
+//    Serial.print("This is Sensor value: ");
+//    sensorValue = map(sensorValue, 0, 1023, 0, 240);     // scale it to use it with the servo (value between 0 and 180)
+//    Serial.println(sensorValue);
+//    checkNoOverRotate();                 //check the current angle and input angle do not over rotate 
+//    while (sensorValue < userInputAngle1) { // goes from 0 degrees to 180 degrees
+//      digitalWrite(In1, HIGH);
+//      digitalWrite(In2,HIGH);            //这个等下要看是正负方向
+//      //myservo.write(10);
+//      sensorValue = analogRead(A0);
+//      sensorValue = map(sensorValue, 0, 1023, 0, 240);
+//      Serial.print("Sensor value after rotate: ");
+//      Serial.println(sensorValue);
+//      //check if sensor have reach the desire angle
+//      if (sensorValue==userInputAngle1){ 
+//        digitalWrite(In2, LOW); 
+//        //mservo.write(0);
+//        Serial.println(" Reach the angle.");
+//        Serial.print("Sensor value after rotate: ");
+//        Serial.println(sensorValue);
+//        while(1){}
+//     }
+//   }
+//}
+void checkNoOverRotate(){
+  //check the current angle and input angle do not over rotate
+    if (userInputAngle1 > 180){ //counterclockwise to the max=0 degree
+      //sensor initial check
         Serial.print(" arm angle illegal.");
         while(1){}
     }
-    if (sensorValue = 0; sensorValue <= 191) { // goes from 0 degrees to 180 degrees
-    // in steps of 1 degree
-      digitalWrite(M1,HIGH);
-      digitalWrite(M2,HIGH);             
-      analogWrite(E1, value);   //PWM Speed Control
-      analogWrite(E2, value);   //PWM Speed Control
-      delay(15);                       // waits 15ms for the servo to reach the position
-    }else {
-      digitalWrite(M1,LOW);
-      digitalWrite(M2,LOW);     
-      analogWrite(E1, value);   //PWM Speed Control
-      analogWrite(E2, value);   //PWM Speed Control
-      delay(15);                       // waits 15ms for the servo to reach the position
+    if ((sensorValue+userInputAngle1) > 180){ //counterclockwise to the max=0 degree
+      //sensor initial check
+        Serial.print(" arm angle illegal.");
+        while(1){}
     }
-//    Serial.print(" Please enter the shoulder angle.");
-//    
-//   if(Serial.available())
-//   {
-//        userAngle1 = Serial.read();
-//   }                  // Returnn The first byte of incoming serial data available (or -1 if no data is available). Data type: int.
-//   validityTest = userAngle1+sensorValue;
-//   if (validityTest > 180)
-//   {                            // sensor plus user input check
-//        Serial.print(" exceed maximum angle avaiable.");
-//   }
-        
-   // myservo.write(sensorValue);                  // sets the servo position according to the scaled value
-    delay(30);                           // waits for the servo to get there
-   
- // }
+}
+
+
+
+
+void stateOfMotor1(){
+  digitalWrite(In1, HIGH);
+  digitalWrite(In2, LOW);
+  delay(3000);
+}
+void stateOfMotor2(){
+  digitalWrite(In1, HIGH);
+  digitalWrite(In2, HIGH);
+  delay(3000);
+}
+void stopMotor(){
+  digitalWrite(In1, LOW);
+  digitalWrite(In2, LOW);
+  digitalWrite(servo1PIN, LOW); // stop pulse to the servo
+}
+
+void demoOne()
+{
+  // this function will run the motors in both directions at a fixed speed
+  //turn motor on
+  digitalWrite(servo1PIN, HIGH); // turn on pulse to the servo
+  stateOfMotor2();
+  // now change motor directions
+  stateOfMotor1();
+  // now turn off motors
+  stopMotor();
+}
+
+void loop()
+{
+  demoOne();
+  delay(1000);
 }
