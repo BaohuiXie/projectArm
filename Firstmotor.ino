@@ -123,3 +123,34 @@ void loop()
   demoOne();
   delay(1000);
 }
+
+
+int SERVOPULSEPIN = 2;     // Control pin for servo motor, usually yellow wire to the servo  
+int minPulseTime = 500;        // minimum servo pulse time  
+int maxPulseTime = 2400;       // maximum servo pulse time  
+int pulseTime = 0;             // Amount of time to pulse the servo 
+ 
+ long lastPulse = 0;        // the time in milliseconds of the last pulse  
+int refreshTime = 20;      // the time needed in between pulses in milliseconds                             
+// servos have 50Hz rate, 1sec/50 = 20 milliseconds  
+ 
+ int analogValue = 0;       // the value returned from the analog sensor, between 0 and 1023  
+int ANALOGINPUTPIN = 0;    // the analog pin that the sensor is on 
+ 
+ void setup() {    pinMode(SERVOPULSEPIN, OUTPUT);  // Set servo pin as an output pin    
+               pulseTime = minPulseTime;        // Set the motor position value to the minimum    
+               Serial.begin(9600);              // Set up the serial connection for printing  
+              } 
+ 
+ void loop() {    analogValue = analogRead(ANALOGINPUTPIN);                  // read the analog input    
+              pulseTime = map(analogValue,0,1023,minPulseTime,maxPulseTime); // convert the analog value                                                              // to a range between minPulse                                                              // and maxPulse. 
+ 
+   // pulse the servo again if the refresh time (20 ms) have passed:    
+              if (millis() - lastPulse >= refreshTime) {       
+                  digitalWrite(SERVOPULSEPIN, HIGH);       // turn on pulse to the servo       
+                  delayMicroseconds(pulseTime);                // length of the pulse sets the motor position       
+                  digitalWrite(SERVOPULSEPIN, LOW);        // stop pulse to the servo       
+                  lastPulse = millis();                    // save the time of the last pulse    
+              }    Serial.println(analogValue);    
+              Serial.println(pulseTime);  
+             } 
