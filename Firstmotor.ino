@@ -1,51 +1,70 @@
 //userInput value
 int userInputAngle1=0;
 
+
+
 //configuration for H bridge (controlling direction)
 int In1=7;
 int In2=8;
 
+
+
 //-------------------------------------------------------------------------------------------------------------
-//configuration for speed control(to servo)
+//configuration for servo
 int servo1PIN = 2; // Control pin for servo motor, usually yellow wire to the servo
+
+
+
+//-------------------------------------------------------------------------------------------------------------
+//configuration for sensor
+int sensorValue = 0; // the value returned from the analog sensor, between 0 and 1023
+int analog1INPUTPIN = A0; // the analog pin that the sensor is on
+
+
+
+//PWM value set up configuration
 int minPulseTime = 500; // minimum servo pulse time
 int maxPulseTime = 2400; // maximum servo pulse time
 int pulseTime = 0; // Amount of time to pulse the servo
 long lastPulse = 0; // the time in milliseconds of the last pulse
 int refreshTime = 20; // the time needed in between pulses in milliseconds
-//---------------------// servos have 50Hz rate, 1sec/50 = 20 milliseconds-----------
-int sensorValue = 0; // the value returned from the analog sensor, between 0 and 1023
-int analog1INPUTPIN = A0; // the analog pin that the sensor is on
+
 
 
 void setup() {
+  
+   //H bridge
     pinMode(In1,OUTPUT);  //HIGH: LOW:
     pinMode(In2,OUTPUT);  //HIGH: LOW:
-    pinMode (A0,INPUT);   //select the input pin for potentiometer
-    Serial.begin(9600);   //start communication at 9600 baud
 
-    //Speed controlling setput
+   //servo
     pinMode(servo1PIN, OUTPUT); // Set servo pin as an output pin
+
+    
+   //sensor
+    pinMode (A0,INPUT);   //select the input pin for potentiometer
+
+   //value set up
     pulseTime = minPulseTime; // Set the motor position value to the minimum
-    Serial.begin(9600); // Set up the serial connection for printing
+    Serial.begin(9600); // Set up the serial connection for printing, start communication at 9600 baud
 }
 
-//void loop() {
-//    //SPEED controlling part
-//    sensorValue = analogRead(analog1INPUTPIN); // read the analog input
-//    pulseTime = map(sensorValue,0,1023,minPulseTime,maxPulseTime); // convert the analog value to a range between minPulse and maxPulse.
-//    //pulse the servo again if the refresh time (20 ms) have passed:
-//    if (millis() - lastPulse >= refreshTime) {
-//        digitalWrite(In1,HIGH);
-//        digitalWrite(In2,LOW); 
-//    
-//        digitalWrite(servo1PIN, HIGH); // turn on pulse to the servo
-//        delayMicroseconds(pulseTime); // length of the pulse sets the motor position
-//        digitalWrite(servo1PIN, LOW); // stop pulse to the servo
-//        lastPulse = millis(); // save the time of the last pulse
-//    }
-//    Serial.println(sensorValue);
-//    Serial.println(pulseTime);
+
+void loop() {
+    //SPEED controlling part
+    sensorValue = analogRead(analog1INPUTPIN); // read the analog input
+    pulseTime = map(sensorValue,0,1023,minPulseTime,maxPulseTime); // convert the analog value to a range between minPulse and maxPulse.
+    //pulse the servo again if the refresh time (20 ms) have passed:
+    if (millis() - lastPulse >= refreshTime) {
+        digitalWrite(In1,HIGH);
+        digitalWrite(In2,HIGH); 
+        digitalWrite(servo1PIN, HIGH); // turn on pulse to the servo
+        delayMicroseconds(pulseTime); // length of the pulse sets the motor position
+        digitalWrite(servo1PIN, LOW); // stop pulse to the servo
+        lastPulse = millis(); // save the time of the last pulse
+    }
+    Serial.println(sensorValue);
+    Serial.println(pulseTime);
 
     //direction controlling part
    
@@ -72,7 +91,7 @@ void setup() {
 //        while(1){}
 //     }
 //   }
-//}
+}
 void checkNoOverRotate(){
   //check the current angle and input angle do not over rotate
     if (userInputAngle1 > 180){ //counterclockwise to the max=0 degree
@@ -89,68 +108,99 @@ void checkNoOverRotate(){
 
 
 
+//
+//void stateOfMotor1(){
+//  digitalWrite(In1, HIGH);
+//  digitalWrite(In2, LOW);
+//  delay(3000);
+//}
+//void stateOfMotor2(){
+//  digitalWrite(In1, HIGH);
+//  digitalWrite(In2, HIGH);
+//  delay(3000);
+//}
+//void stopMotor(){
+//  digitalWrite(In1, LOW);
+//  digitalWrite(In2, LOW);
+//  digitalWrite(servo1PIN, LOW); // stop pulse to the servo
+//}
+//
+//void demoOne()
+//{
+//  // this function will run the motors in both directions at a fixed speed
+//  //turn motor on
+//    sensorValue = analogRead(analog1INPUTPIN); // read the analog input
+//    pulseTime = map(sensorValue,0,1023,minPulseTime,maxPulseTime); // convert the analog value to a range between minPulse and maxPulse.
+//    //pulse the servo again if the refresh time (20 ms) have passed:
+//    if (millis() - lastPulse >= refreshTime) {
+//        digitalWrite(servo1PIN, HIGH); // turn on pulse to the servo
+//        delayMicroseconds(pulseTime); // length of the pulse sets the motor position
+//          stateOfMotor2();
+//          // now change motor directions
+//          //stateOfMotor1();
+//          // now turn off motors
+//          //stopMotor();
+//        lastPulse = millis(); // save the time of the last pulse
+//    }
+//
+//}
+//
+//void loop()
+//{
+//  Serial.println("check");
+//  demoOne();
+//  delay(1000);
+//}
 
-void stateOfMotor1(){
-  digitalWrite(In1, HIGH);
-  digitalWrite(In2, LOW);
-  delay(3000);
-}
-void stateOfMotor2(){
-  digitalWrite(In1, HIGH);
-  digitalWrite(In2, HIGH);
-  delay(3000);
-}
-void stopMotor(){
-  digitalWrite(In1, LOW);
-  digitalWrite(In2, LOW);
-  digitalWrite(servo1PIN, LOW); // stop pulse to the servo
-}
-
-void demoOne()
-{
-  // this function will run the motors in both directions at a fixed speed
-  //turn motor on
-  digitalWrite(servo1PIN, HIGH); // turn on pulse to the servo
-  stateOfMotor2();
-  // now change motor directions
-  stateOfMotor1();
-  // now turn off motors
-  stopMotor();
-}
-
-void loop()
-{
-  demoOne();
-  delay(1000);
-}
 
 
-int SERVOPULSEPIN = 2;     // Control pin for servo motor, usually yellow wire to the servo  
-int minPulseTime = 500;        // minimum servo pulse time  
-int maxPulseTime = 2400;       // maximum servo pulse time  
-int pulseTime = 0;             // Amount of time to pulse the servo 
- 
- long lastPulse = 0;        // the time in milliseconds of the last pulse  
-int refreshTime = 20;      // the time needed in between pulses in milliseconds                             
-// servos have 50Hz rate, 1sec/50 = 20 milliseconds  
- 
- int analogValue = 0;       // the value returned from the analog sensor, between 0 and 1023  
-int ANALOGINPUTPIN = 0;    // the analog pin that the sensor is on 
- 
- void setup() {    pinMode(SERVOPULSEPIN, OUTPUT);  // Set servo pin as an output pin    
-               pulseTime = minPulseTime;        // Set the motor position value to the minimum    
-               Serial.begin(9600);              // Set up the serial connection for printing  
-              } 
- 
- void loop() {    analogValue = analogRead(ANALOGINPUTPIN);                  // read the analog input    
-              pulseTime = map(analogValue,0,1023,minPulseTime,maxPulseTime); // convert the analog value                                                              // to a range between minPulse                                                              // and maxPulse. 
- 
-   // pulse the servo again if the refresh time (20 ms) have passed:    
-              if (millis() - lastPulse >= refreshTime) {       
-                  digitalWrite(SERVOPULSEPIN, HIGH);       // turn on pulse to the servo       
-                  delayMicroseconds(pulseTime);                // length of the pulse sets the motor position       
-                  digitalWrite(SERVOPULSEPIN, LOW);        // stop pulse to the servo       
-                  lastPulse = millis();                    // save the time of the last pulse    
-              }    Serial.println(analogValue);    
-              Serial.println(pulseTime);  
-             } 
+
+
+//
+//
+//
+//
+////--------------------------TEST COODE
+//int SERVOPULSEPIN = 11;     // Control pin for servo motor, usually yellow wire to the servo  
+//int minPulseTime = 500;        // minimum servo pulse time  
+//int maxPulseTime = 2400;       // maximum servo pulse time  
+//int pulseTime = 0;             // Amount of time to pulse the servo 
+// 
+// long lastPulse = 0;        // the time in milliseconds of the last pulse  
+//int refreshTime = 20;      // the time needed in between pulses in milliseconds   
+////configuration for H bridge (controlling direction)
+//int In1=7;
+//int In2=8;      
+//int In3=4;
+//int In4=2;                    
+//// servos have 50Hz rate, 1sec/50 = 20 milliseconds  
+// 
+// int analogValue = 0;       // the value returned from the analog sensor, between 0 and 1023  
+//int ANALOGINPUTPIN = 0;    // the analog pin that the sensor is on 
+// 
+// void setup() {    pinMode(SERVOPULSEPIN, OUTPUT);  // Set servo pin as an output pin    
+//               pulseTime = minPulseTime;        // Set the motor position value to the minimum    
+//               Serial.begin(9600);              // Set up the serial connection for printing  
+//               pinMode(In1,OUTPUT);  //HIGH: LOW:
+//                pinMode(In2,OUTPUT);  //HIGH: LOW:
+//                digitalWrite(In1,HIGH);
+//              digitalWrite(In2,LOW);
+//               digitalWrite(In3,HIGH);
+//              digitalWrite(In4,LOW);
+//              } 
+// 
+// void loop() {    
+//              
+//              analogValue = analogRead(ANALOGINPUTPIN);                  // read the analog input    
+//              //pulseTime = map(analogValue,0,1023,minPulseTime,maxPulseTime); // convert the analog value                                                              // to a range between minPulse                                                              // and maxPulse. 
+//                  pulseTime = 1300;
+//   // pulse the servo again if the refresh time (20 ms) have passed:    
+//              //if (millis() - lastPulse >= refreshTime) {     
+//                  digitalWrite(SERVOPULSEPIN, HIGH);       // turn on pulse to the servo    
+//                  delayMicroseconds(pulseTime);                // length of the pulse sets the motor position       
+//                  digitalWrite(SERVOPULSEPIN, LOW);        // stop pulse to the servo       
+//                 // lastPulse = millis();                    // save the time of the last pulse    
+//            //  }    
+//              Serial.println(analogValue);    
+//              //Serial.println(pulseTime);  
+//             } 
