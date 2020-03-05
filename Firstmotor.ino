@@ -144,11 +144,7 @@ void loop() {
 //  rotationOperator(rotationStateShoulder, angleShoulder, sensorValueShoulder, analogInShoulder,  In3, In4, enB, 80, userInShoulder, minShoulder, maxShoulder);
   rotationOperator(rotationStateBicep, angleBicep, sensorValueBicep, analogInBicep,  In11, In21, enA1, 200, userInBicep, minBicep, maxBicep);
   
-  if(angleBicep == userInBicep){
-    Serial.print("reach the if condition ");
-      while(1){};  
-  }
-  while(1){}; 
+
 }
 
 
@@ -166,7 +162,6 @@ void rotationOperator(int roState, int angl, int senValue, int analogInPin, int 
         
          Serial.print("angle of bicep: ");
          Serial.println(angl);
-         delay(3);
       }
       break;
     case 0:                                                                                // clockwise (no rising)
@@ -177,12 +172,12 @@ void rotationOperator(int roState, int angl, int senValue, int analogInPin, int 
       
          Serial.print("angle of bicep: ");
          Serial.println(angl);
-         delay(3);
         }
        break;
      default:                      //rest
-      
+      turnOffMotor(pinNumber1, pinNumber2);
       break;
+     turnOffMotor(pinNumber1, pinNumber2);
     }   
 }
 
@@ -211,9 +206,10 @@ void turnOffMotor(int pinNumber1, int pinNumber2){
 //------------------------------------------------------------------------------------------
 //从马达背面看过去
 void clockWiseRotate(int pinNumber1, int pinNumber2, int enNumber, int enSpeed){
-  analogWrite(enNumber, enSpeed);
   digitalWrite(pinNumber1, LOW);         
   digitalWrite(pinNumber2, HIGH);
+  analogWrite(enNumber, enSpeed);
+  //delay(30);//3sec
 }
 
 
@@ -221,7 +217,8 @@ void clockWiseRotate(int pinNumber1, int pinNumber2, int enNumber, int enSpeed){
 //------------------------------------------------------------------------------------------
 //从马达背面看过去
 void counterClockWiseRotate(int pinNumber1, int pinNumber2, int enNumber, int enSpeed){
-   analogWrite(enNumber, enSpeed);
    digitalWrite(pinNumber1, HIGH);         
    digitalWrite(pinNumber2, LOW);
+   analogWrite(enNumber, enSpeed);
+   //delay(30);//3sec
 }
