@@ -3,16 +3,11 @@ int userInputAngle1=10;
 
 
 
-
-//configuration for H bridge (controlling direction)------------------------------------------------------------
+//--------------------------------------------------------------------------------------------------
+//configuration for H bridge (controlling direction)
 int In1=7;
 int In2=8;
-
-
-
-//-------------------------------------------------------------------------------------------------------------
-//configuration for servo
-int servo1PIN = 11; // Control pin for servo motor, usually yellow wire to the servo
+int ENA=9;
 
 
 
@@ -30,23 +25,20 @@ int rotationState1;   //0: not raising, 1: raising
 
 
 
-//PWM value set up configuration
-int minPulseTime = 500; // minimum servo pulse time
-int maxPulseTime = 2400; // maximum servo pulse time
-int pulseTime = 0; // Amount of time to pulse the servo
-long lastPulse = 0; // the time in milliseconds of the last pulse
-int refreshTime = 20; // the time needed in between pulses in milliseconds
-
-void setup() {
-    //servo
-    pinMode(servo1PIN, OUTPUT); // Set servo pin as an output pin
-
-    
+//----------------------------------------------------------------------------------------------
+//Setting
+void setup() { 
    //sensor
-    pinMode (A0,INPUT);   //select the input pin for potentiometer
+    //Shoulder joint sensor
+    pinMode(A0,INPUT);   //select the input pin for potentiometer
+
+   //H bridge
+    //Shoulder joint Motor
+    pinMode(ENA, OUTPUT);
+    pinMode(In1, OUTPUT);
+    pinMode(In2, OUTPUT);
 
    //value set up
-    pulseTime = minPulseTime; // Set the motor position value to the minimum
     Serial.begin(9600); // Set up the serial connection for printing, start communication at 9600 baud
 }
 
@@ -54,7 +46,7 @@ void loop() {
   //read sensor section
   sensorValue1 = analogRead(analog1INPUTPIN);
   angle1 = map(sensorValue1,0,1023, 0,240);
-  pulseTime = 1000;                               //暂定
+ 
   
   //determine state of arm rotation
   rotationState1 = stateOfRotation(angle1,userInputAngle1);
@@ -67,24 +59,22 @@ void loop() {
 
 
 
-
-//opertating the rotation for diferent motor or joint with different case-------------------
+//---------------------------------------------------------------------------------------------
+//opertating the rotation for diferent motor or joint with different case
 void rotationOperator(int roState, int angl, int senValue, int motorSignalPin, int userIn){
    switch (roState){
     case 1:
       while (angl > 0 && angl < userIn) { 
         senValue = analogRead(motorSignalPin);
         angl = map(senValue,0,1023,0,240);
-        //generate PWM
-        pwmGenerator(angl);
+        
       }
       break;
     case 0:
       while (angl > userIn && angl > 0) { 
         senValue = analogRead(motorSignalPin);
         angl = map(senValue,0,1023,0,240);
-        //generate PWM
-        pwmGenerator(angl);
+        
         }
        break;
      default:                      //rest
@@ -98,9 +88,10 @@ void rotationOperator(int roState, int angl, int senValue, int motorSignalPin, i
 
 
 
-
-//determine state of arm rotation--------------------------------------
+//-------------------------------------------------------------------------------------
+//determine state of arm rotation
 int stateOfRotation(int ang, int userinput){
+  //0: not raising, 1: raising 这个要注意查
   if(ang < userinput){
     return 1;
   }else if(ang > userinput){
@@ -109,16 +100,26 @@ int stateOfRotation(int ang, int userinput){
 }
 
 
-//generate PWM-----------------------------------------------------------------
-void pwmGenerator(int angl){
-  //generate PWM
-      if (millis() - lastPulse >= refreshTime) {
-          digitalWrite(servo1PIN, HIGH); // turn on pulse to the servo
-          delayMicroseconds(pulseTime); // length of the pulse sets the motor position
-          digitalWrite(servo1PIN, LOW); // stop pulse to the servo
-          lastPulse = millis(); // save the time of the last pulse
-      }
-      Serial.print("while angle: ");
-      Serial.println(angl);
-      delay(15);                       // waits 15ms for the servo to reach the position
+//--------------------------------------------------------------------------------------
+//turn off motors
+void turnOffMotor(int pinNumber1, int pinNumber2){
+  digitalWrite(pinNumber1, LOW);
+  digitalWrite(pinNumber2, LOW);
+}
+
+
+//------------------------------------------------------------------------------------------
+void clockWiseRotate(int pinNumber1, int pinNumber2, int enNumber, int enSpeed){
+  analogWrite(enNumber, enSpeed);
+  digitalWrite(pinNumber1, HIGH);         //这个要验证
+  digitalWrite(pinNumber2, LOW);
+}
+
+
+
+//------------------------------------------------------------------------------------------
+void clockWiseRotate(int pinNumber1, int pinNumber2,int enNumber, int enSpeed){
+   analogWrite(enNumber, enSpeed);
+  digitalWrite(pinNumber1, LOW);         //这个要验证
+  digitalWrite(pinNumber2, HIGH);
 }
