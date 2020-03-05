@@ -1,8 +1,8 @@
 //bicep 校准时sensor(红黄绿，黄绿蓝)调到110， 手臂与shoulder两束对齐， range: 20-200 (0-180)， sensor背对你clockwise为增大角度，红为地线绿为火线
 //shoulder motor 从背面看过去 counterclockwise rotating means shoulder自身角度来说counterclockwise
 //userInput value----------------------------------------------------------------------------------------------
-int userInBack=80;
-int userInShoulder=150;
+int userInBack=90;
+int userInShoulder=90;
 int userInBicep=170+20;                  // plus 20 is defalt value, do not delect (20-200)
 
 
@@ -156,8 +156,8 @@ void rotationOperator(int roState, int angl, int senValue, int analogInPin, int 
         senValue = analogRead(analogInPin);
         angl = map(senValue,0,1023,0,240);
         counterClockWiseRotate(pinNumber1,pinNumber2,enNumber,enSpeed);
-        
-         Serial.print("angle of bicep: ");
+        Serial.print("angle of : ");
+         Serial.print(analogInPin);
          Serial.println(angl);
       }
       break;
@@ -167,7 +167,8 @@ void rotationOperator(int roState, int angl, int senValue, int analogInPin, int 
         angl = map(senValue,0,1023,0,240);
         clockWiseRotate(pinNumber1,pinNumber2,enNumber,enSpeed);
       
-         Serial.print("angle of bicep: ");
+         Serial.print("angle of : ");
+         Serial.print(analogInPin);
          Serial.println(angl);
         }
        break;
