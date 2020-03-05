@@ -15,7 +15,7 @@ int maxBack = 90;
 //shoulder
 int minShoulder = 0;
 int maxShoulder = 180;
-//bicep
+  //bicep
 int minBicep = 20;
 int maxBicep = 200;
 
@@ -97,17 +97,17 @@ void setup() {
 
 void loop() {
   //read sensor section
-  //sensorValueBack = analogRead(analogInBack);
-  //angleBack = map(sensorValueBack,0,1023, 0,240);
-//  Serial.print("angle of Back: ");
-//  Serial.println(angleBack);
-//  delay(3);
+  sensorValueBack = analogRead(analogInBack);
+  angleBack = map(sensorValueBack,0,1023, 0,240);
+  Serial.print("angle of Back: ");
+  Serial.println(angleBack);
+  delay(3);
   
-//  sensorValueShoulder = analogRead(analogInShoulder);
-//  angleShoulder = map(sensorValueShoulder,0,1023, 0,240);
-//  Serial.print("angle of Shoulder: ");
-//  Serial.println(angleShoulder);
-//  delay(3);
+  sensorValueShoulder = analogRead(analogInShoulder);
+  angleShoulder = map(sensorValueShoulder,0,1023, 0,240);
+  Serial.print("angle of Shoulder: ");
+  Serial.println(angleShoulder);
+  delay(3);
 
 
   sensorValueBicep = analogRead(analogInBicep);
@@ -118,21 +118,20 @@ void loop() {
 
   
   //determine state of arm rotation
-  //rotationStateBack = stateOfRotation(angleBack,userInBack);
-//  rotationStateShoulder = stateOfRotation(angleShoulder,userInShoulder);
+  rotationStateBack = stateOfRotation(angleBack,userInBack);
+  rotationStateShoulder = stateOfRotation(angleShoulder,userInShoulder);
   rotationStateBicep = stateOfRotation(angleBicep,userInBicep);
 
 
   //check state section
-//  Serial.print("state of Back rotation: ");
-//  Serial.println(rotationStateBack);
-//  delay(3);
-//  Serial.print("state of Shoulder rotation: ");
-//  Serial.println(rotationStateShoulder);
-//  delay(3);
+  Serial.print("state of Back rotation: ");
+  Serial.println(rotationStateBack);
+
+  Serial.print("state of Shoulder rotation: ");
+  Serial.println(rotationStateShoulder);
+
   Serial.print("state of Bicep rotation: ");
   Serial.println(rotationStateBicep);
-  delay(3);
 
 
 
@@ -140,11 +139,9 @@ void loop() {
 // speed is set to 150 in the midterm demo
 
   //operating section
-  //rotationOperator(rotationStateBack, angleBack, sensorValueBack, analogInBack,  In1, In2, enA, 80, userInBack, minBack, maxBack);
-//  rotationOperator(rotationStateShoulder, angleShoulder, sensorValueShoulder, analogInShoulder,  In3, In4, enB, 80, userInShoulder, minShoulder, maxShoulder);
-  rotationOperator(rotationStateBicep, angleBicep, sensorValueBicep, analogInBicep,  In11, In21, enA1, 200, userInBicep, minBicep, maxBicep);
-  
-
+  rotationOperator(rotationStateBack, angleBack, sensorValueBack, analogInBack,  In1, In2, enA, 100, userInBack, minBack, maxBack);
+  rotationOperator(rotationStateShoulder, angleShoulder, sensorValueShoulder, analogInShoulder,  In3, In4, enB, 100, userInShoulder, minShoulder, maxShoulder);
+  rotationOperator(rotationStateBicep, angleBicep, sensorValueBicep, analogInBicep,  In11, In21, enA1, 100, userInBicep, minBicep, maxBicep);
 }
 
 
