@@ -1,19 +1,22 @@
 //motor 从背面看过去 counterclockwise rotating means shoulder自身角度来说counterclockwise
 //userInput value----------------------------------------------------------------------------------------------
-int userInBack=10;
-int userInShoulder=10;
-
+int userInBack=80;
+int userInShoulder=150;
+int userInBicep=80;
 
 
 
 //---------------------------------------------------------------------------------------------------------------
 //offset range of the sensor (range of each joint)
 //back
-int minBack;
-int maxBack;
+int minBack = 0;
+int maxBack = 90;
 //shoulder
-int minShoulder;
-int maxShoulder;
+int minShoulder = 0;
+int maxShoulder = 180;
+//bicep
+int minBicep = 0;
+int maxBicep = 180;
 
 
 
@@ -77,36 +80,38 @@ void setup() {
 
 void loop() {
   //read sensor section
-  sensorValueBack = analogRead(analogInBack);
-  angleBack = map(sensorValueBack,0,1023, 0,240);
+  //sensorValueBack = analogRead(analogInBack);
+  //angleBack = map(sensorValueBack,0,1023, 0,240);
   sensorValueShoulder = analogRead(analogInShoulder);
   angleShoulder = map(sensorValueShoulder,0,1023, 0,240);
-
+ Serial.print("angle of shoulder: ");
+  Serial.println(angleShoulder);
+  delay(3);
 
   
   //determine state of arm rotation
+  //rotationStateBack = stateOfRotation(angleBack,userInBack);
   rotationStateShoulder = stateOfRotation(angleShoulder,userInShoulder);
-  rotationStateBack = stateOfRotation(angleBack,userInBack);
-
-
+  
 
 
   //check state section
+//  Serial.print("state of Back rotation: ");
+//  Serial.println(rotationStateShoulder);
+//  delay(3);
   Serial.print("state of Shoulder rotation: ");
   Serial.println(rotationStateShoulder);
   delay(3);
-  Serial.print("state of Back rotation: ");
-  Serial.println(rotationStateShoulder);
-  delay(3);
+
 
 
 
 // speed is set to 150 in the midterm demo
 
   //operating section
-  rotationOperator(rotationStateBack, angleBack, sensorValueBack, analogInBack,  In3, In4, ENB, 150, userInBack, minBack, maxBack);
+  //rotationOperator(rotationStateBack, angleBack, sensorValueBack, analogInBack,  In3, In4, ENB, 150, userInBack, minBack, maxBack);
   rotationOperator(rotationStateShoulder, angleShoulder, sensorValueShoulder, analogInShoulder,  In1, In2, ENA, 150, userInShoulder, minShoulder, maxShoulder);
-  if(angleBack == userInBack || angleShoulder == userInShoulder){
+  if(angleShoulder == userInShoulder){
       while(1){};  
   }
 }
@@ -119,19 +124,25 @@ void rotationOperator(int roState, int angl, int senValue, int analogInPin, int 
               int pinNumber2, int enNumber, int enSpeed, int userIn, int minRange, int maxRange){
    switch (roState){
     case 1:                                                                                // Counterclockwise (rising)
-      while ((angl > minRange) && (angl < maxRange) && (angl < userIn)) { 
+      while ((angl >= minRange) && (angl < maxRange) && (angl < userIn)) { 
         senValue = analogRead(analogInPin);
         angl = map(senValue,0,1023,0,240);
         counterClockWiseRotate(pinNumber1,pinNumber2,enNumber,enSpeed);
         delay(3);
+         Serial.print("angle of Shoulder: ");
+         Serial.println(angl);
+         delay(3);
       }
       break;
     case 0:                                                                                // clockwise (no rising)
-      while ((angl > minRange) && (angl < maxRange) && (angl > userIn)) { 
+      while ((angl >= minRange) && (angl < maxRange) && (angl > userIn)) { 
         senValue = analogRead(analogInPin);
         angl = map(senValue,0,1023,0,240);
         clockWiseRotate(pinNumber1,pinNumber2,enNumber,enSpeed);
         delay(3);
+         Serial.print("angle of Shoulder: ");
+         Serial.println(angl);
+         delay(3);
         }
        break;
      default:                      //rest
