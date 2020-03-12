@@ -1,5 +1,6 @@
 //back 初始角度20度，抬手角度增加
 //shoulder 手臂垂直放下时140度，自身来看逆时针转（抬手）角度减少
+//BICEP 初始180，手臂自身顺时针转角度增大，逆时针角度变小
 //elbow 初始角度20度，极限是110度
 
 
@@ -54,15 +55,15 @@ void loop() {
 //  Serial.println(angleShoulder);
 //  delay(3);
 //  
-//  sensorValueBicep = analogRead(analogInBicep);
-//  angleBicep = map(sensorValueBicep,0,1023, 0,240);
-//  Serial.print("angle of bicep: ");
-//  Serial.println(angleBicep);
-//  delay(3);
-  
-  sensorValueElbow = analogRead(analogInElbow);
-  angleElbow = map(sensorValueElbow,0,1023, 0,240);
-  Serial.print("angle of elbow: ");
-  Serial.println(angleElbow);
+  sensorValueBicep = analogRead(analogInBicep);
+  angleBicep = map(sensorValueBicep,0,1023, 0,240);
+  Serial.print("angle of bicep: ");
+  Serial.println(angleBicep);
   delay(3);
+  
+//  sensorValueElbow = analogRead(analogInElbow);
+//  angleElbow = map(sensorValueElbow,0,1023, 0,240);
+//  Serial.print("angle of elbow: ");
+//  Serial.println(angleElbow);
+//  delay(3);
 }
