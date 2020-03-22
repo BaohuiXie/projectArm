@@ -1,5 +1,9 @@
 //bicep 校准时sensor(红黄绿，黄绿蓝)调到110， 手臂与shoulder两束对齐， range: 20-200 (0-180)， sensor背对你clockwise为增大角度，红为地线绿为火线
 //shoulder motor 从背面看过去 counterclockwise rotating means shoulder自身角度来说counterclockwise
+//back 初始角度20度，抬手角度增加
+//shoulder 手臂垂直放下时140度，自身来看逆时针转（抬手）角度减少
+//BICEP 初始180，手臂自身顺时针转角度增大，逆时针角度变小
+//elbow 初始角度20度，极限是116度-20度
 //userInput value----------------------------------------------------------------------------------------------
 int userInBack=(90+20);
 int userInShoulder=90;
