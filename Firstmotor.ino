@@ -1,37 +1,46 @@
 //bicep 校准时sensor(红黄绿，黄绿蓝)调到110， 手臂与shoulder两束对齐， range: 20-200 (0-180)， sensor背对你clockwise为增大角度，红为地线绿为火线
 //shoulder motor 从背面看过去 counterclockwise rotating means shoulder自身角度来说counterclockwise
-//back 初始角度20度，抬手角度增加
+//back 初始角度16度，抬手角度增加
 //shoulder 手臂垂直放下时140度，自身来看逆时针转（抬手）角度减少
 //BICEP 初始180，手臂自身顺时针转角度增大，逆时针角度变小
-//elbow 初始角度20度，极限是116度-20度
-//userInput value----------------------------------------------------------------------------------------------
-int userInBack=(90+20);
-int userInShoulder=90;
-int userInBicep=170;                  // plus 20 is defalt value, do not delect (20-200)
-int userInElbow=90;
+//elbow 初始角度20度，极限是116度至20度
+//不要输入离极限接近的值会有以下两个问题：1.电源电压不足以提供手臂到达那个位置  2.速度过猛导致越过极限值
+//userInput value------------------------------------------------------------------------------------------------------
+int userInBack=0;                  //input range 0-93   尽量取0-55，电压不足
+int userInShoulder=0;            //input range -55 to 110
+int userInBicep=0;                  //INPUT RANGE -40 TO 50
+int userInElbow=20;                //input range 20 to 80
+
+
+//convert userInput value to sensor input value----------------------------------------------------------------------------------------------
+int cvtUserInBack=(userInBack+17);                     //input range 17-110
+int cvtUserInShoulder=(140-(userInShoulder));            //input range 30 to 195
+int cvtUserInBicep=(180-(userInBicep));                  // input range 130 to 220
+int cvtUserInElbow=(userInElbow+(8*userInElbow/20));       //input range 25 to 116
 
 
 //---------------------------------------------------------------------------------------------------------------
 //offset range of the sensor (range of each joint)
+
 //back
-int minBack = 20;
-int maxBack = 110;
+int minBack = 17;           //实际 0
+int maxBack = 110;          //93
 //shoulder
-int minShoulder = 30;
-int maxShoulder = 180;
+int minShoulder = 30;       //实际110
+int maxShoulder = 195;      //-55
   //bicep
-int minBicep = 130;
-int maxBicep = 220;
+int minBicep = 130;         //实际50
+int maxBicep = 220;         //-40
   //elbow
-int minElbow =20;
-int maxElbow =116;
+int minElbow =25;           //实际20
+int maxElbow =116;          //80
 
 
 //--------------------------------------------------------------------------------------------------
 //configuration for H bridge (controlling direction)
 //Back
-int In1=0;
-int In2=1;
+int In1=6;
+int In2=10;
 int enA=3;
 //Shoulder
 int In3=2;
@@ -40,7 +49,7 @@ int enB=5;
 //bicep
 int In11=7;
 int In21=8;
-int enA1=6;
+int enA1=9;
 //Elbow
 int In31=13;
 int In41=12;
@@ -117,113 +126,117 @@ void setup() {
 
 void loop() {
 //  //read sensor section
-//  sensorValueBack = analogRead(analogInBack);
-//  angleBack = map(sensorValueBack,0,1023, 0,240);
-//  Serial.print("angle of Back: ");
-//  Serial.println(angleBack);
+
+  sensorValueBack = analogRead(analogInBack);
+  angleBack = map(sensorValueBack,0,1023, 0,240);
+  Serial.print("angle of Back: ");
+  Serial.println(angleBack);
 //  delay(3);
   
   sensorValueShoulder = analogRead(analogInShoulder);
   angleShoulder = map(sensorValueShoulder,0,1023, 0,240);
   Serial.print("angle of Shoulder: ");
   Serial.println(angleShoulder);
-  delay(3);
+//  delay(3);
+
 //
-//
-//  sensorValueBicep = analogRead(analogInBicep);
-//  angleBicep = map(sensorValueBicep,0,1023, 0,240);
-//  Serial.print("angle of Bicep: ");
-//  Serial.println(angleBicep);
+  sensorValueBicep = analogRead(analogInBicep);
+  angleBicep = map(sensorValueBicep,0,1023, 0,240);
+  Serial.print("angle of Bicep: ");
+  Serial.println(angleBicep);
 //  delay(3);
 //
 //
-//  sensorValueElbow = analogRead(analogInElbow);
-//  angleElbow = map(sensorValueElbow,0,1023,0,240);
-//  Serial.print("angle of Elbow:");
-//  Serial.println(angleElbow);
+  sensorValueElbow = analogRead(analogInElbow);
+  angleElbow = map(sensorValueElbow,0,1023,0,240);
+  Serial.print("angle of Elbow:");
+  Serial.println(angleElbow);
+  Serial.print("angle of cvtUserInElbow:");
+  Serial.println(cvtUserInElbow);
+  
 //  delay(3);
 //  
 
   
   //determine state of arm rotation
-//  rotationStateBack = stateOfRotation(angleBack,userInBack);
-  rotationStateShoulder = stateOfRotation(angleShoulder,userInShoulder);
-//  rotationStateBicep = stateOfRotation(angleBicep,userInBicep);
-//  rotationStateElbow = stateOfRotation(angleElbow,userInElbow);
+  rotationStateBack = stateOfRotation(angleBack,cvtUserInBack);
+  rotationStateShoulder = stateOfRotation(angleShoulder,cvtUserInShoulder);
+  rotationStateBicep = stateOfRotation(angleBicep,cvtUserInBicep);
+  rotationStateElbow = stateOfRotation(angleElbow,cvtUserInElbow);
 //  
 
 
   //check state section
-//  Serial.print("state of Back rotation: ");
-//  Serial.println(rotationStateBack);
-
+  Serial.print("state of Back rotation: ");
+  Serial.println(rotationStateBack);
+//
   Serial.print("state of Shoulder rotation: ");
   Serial.println(rotationStateShoulder);
 
-//  Serial.print("state of Bicep rotation: ");
-//  Serial.println(rotationStateBicep);
+  Serial.print("state of Bicep rotation: ");
+  Serial.println(rotationStateBicep);
 //
-//  Serial.print("state of Elbow rotation: ");
-//  Serial.println(rotationStateElbow);
+  Serial.print("state of Elbow rotation: ");
+  Serial.println(rotationStateElbow);
 //
 
 
 
-// speed is set to 150 in the midterm demo
 
   //operating section
-//  rotationOperator(rotationStateBack, angleBack, sensorValueBack, analogInBack,  In1, In2, enA, 200, userInBack, minBack, maxBack);
-  rotationOperator(rotationStateShoulder, angleShoulder, sensorValueShoulder, analogInShoulder,  In3, In4, enB, 200, userInShoulder, minShoulder, maxShoulder);
-//  rotationOperator(rotationStateBicep, angleBicep, sensorValueBicep, analogInBicep,  In11, In21, enA1, 200, userInBicep, minBicep, maxBicep);
-//  rotationOperator(rotationStateElbow, angleElbow, sensorValueElbow, analogInElbow, In31, In41, enB1, 200, userInElbow, minElbow, maxElbow);
+  rotationOperator(rotationStateBack, angleBack, sensorValueBack, analogInBack,  In1, In2, enA, 230, cvtUserInBack, minBack, maxBack);
+  rotationOperator(rotationStateShoulder, angleShoulder, sensorValueShoulder, analogInShoulder,  In3, In4, enB, 230, cvtUserInShoulder, minShoulder, maxShoulder);
+  rotationOperator(rotationStateBicep, angleBicep, sensorValueBicep, analogInBicep,  In11, In21, enA1, 230, cvtUserInBicep, minBicep, maxBicep);
+  rotationOperator(rotationStateElbow, angleElbow, sensorValueElbow, analogInElbow, In31, In41, enB1, 230, cvtUserInElbow, minElbow, maxElbow);
 //  
+  while(1){}
 }
 
 
 
+//-------------------------------------------------------------------------------------
+//determine state of arm rotation (for shoulder)(FOR BICEP)(FOR ELBOW)
+int stateOfRotation(int ang, int cvtUserinput){//cvtUserinput means the value of sensor
+  //0: counterclockwise, 1: clockwise
+  if(ang < cvtUserinput){
+    return 1;
+  }else if(ang > cvtUserinput){
+    return 0;
+  }
+}
+
 //---------------------------------------------------------------------------------------------
 //opertating the rotation for diferent motor or joint with different case
 void rotationOperator(int roState, int angl, int senValue, int analogInPin, int pinNumber1, 
-              int pinNumber2, int enNumber, int enSpeed, int userIn, int minRange, int maxRange){
+              int pinNumber2, int enNumber, int enSpeed, int cvtUserIn, int minRange, int maxRange){
    switch (roState){
-    case 1:                                                                                // Counterclockwise (rising)
-      while ((angl > minRange) && (angl < maxRange) && (angl < userIn)) { 
+    case 0:                                                                                // Counterclockwise (rising)
+      while ((angl >= minRange-5) && (angl <= maxRange+5) && (angl >= cvtUserIn)) { 
         senValue = analogRead(analogInPin);
         angl = map(senValue,0,1023,0,240);
         counterClockWiseRotate(pinNumber1,pinNumber2,enNumber,enSpeed);
-        Serial.print("angle of : ");
+        Serial.print("angle is : ");
          Serial.println(angl);
       }
       break;
-    case 0:                                                                                // clockwise (no rising)
-      while ((angl > minRange) && (angl < maxRange) && (angl > userIn)) { 
+    case 1:                                                                                // clockwise (no rising)
+      while ((angl >= minRange-5) && (angl <= maxRange+5) && (angl <= cvtUserIn)) { 
         senValue = analogRead(analogInPin);
         angl = map(senValue,0,1023,0,240);
         clockWiseRotate(pinNumber1,pinNumber2,enNumber,enSpeed);
       
-         Serial.print("angle of : ");
+         Serial.print("angle is : ");
          Serial.println(angl);
         }
        break;
      default:                      //rest
       turnOffMotor(pinNumber1, pinNumber2);
       break;
-     turnOffMotor(pinNumber1, pinNumber2);
     }   
+     Serial.print("JUMP OUT THE LOOP");
+     turnOffMotor(pinNumber1, pinNumber2);
 }
 
-
-
-//-------------------------------------------------------------------------------------
-//determine state of arm rotation
-int stateOfRotation(int ang, int userinput){
-  //0: not raising, 1: clockwise(rise) 
-  if(ang < userinput){
-    return 1;
-  }else if(ang > userinput){
-    return 0;
-  }
-}
 
 
 //--------------------------------------------------------------------------------------
@@ -235,7 +248,7 @@ void turnOffMotor(int pinNumber1, int pinNumber2){
 
 
 //------------------------------------------------------------------------------------------
-//从马达背面看过去
+//从马达背面看过去(back:RISE)(shoulder:drop)(BICEP:rotate toward shelf(clockwise))(elbow:rise)
 void clockWiseRotate(int pinNumber1, int pinNumber2, int enNumber, int enSpeed){
   digitalWrite(pinNumber1, LOW);         
   digitalWrite(pinNumber2, HIGH);
@@ -246,7 +259,7 @@ void clockWiseRotate(int pinNumber1, int pinNumber2, int enNumber, int enSpeed){
 
 
 //------------------------------------------------------------------------------------------
-//从马达背面看过去
+//从马达背面看过去(back:DROP)(shoulder:rise)(BICEP:rotate leave shelf(counterclockwise))(ELBOW:drop)
 void counterClockWiseRotate(int pinNumber1, int pinNumber2, int enNumber, int enSpeed){
    digitalWrite(pinNumber1, HIGH);         
    digitalWrite(pinNumber2, LOW);
