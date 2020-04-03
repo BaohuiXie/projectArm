@@ -156,45 +156,4 @@ void loop() {
 }
 
 
-//HIGH
-////FOR BACK
-//void rotationOperator(int roState, int angl, int senValue, int analogInPin, int pinNumber1, 
-//              int pinNumber2, int enNumber, int enSpeed, int cvtUserIn, int minRange, int maxRange){
-//   switch (roState){
-//    case 0:                                                                                // Counterclockwise (rising)
-//    //每个值所加减的5是为了防止速度过猛导致的越值
-//      while ((angl >= (minRange-5)) && (angl <= (maxRange+5)) && (angl <= cvtUserIn)) { 
-//        senValue = analogRead(analogInPin);
-//        angl = map(senValue,0,1023,0,240);
-//        counterClockWiseRotate(pinNumber1,pinNumber2,enNumber,enSpeed);
-//        Serial.print("angle is : ");
-//         Serial.println(angl);
-//      }
-//      break;
-//    case 1:                                                                                // clockwise (no rising)
-//      while ((angl >= (minRange-5)) && (angl <= (maxRange+5)) && (angl >= cvtUserIn)) { 
-//        senValue = analogRead(analogInPin);
-//        angl = map(senValue,0,1023,0,240);
-//        clockWiseRotate(pinNumber1,pinNumber2,enNumber,enSpeed);
-//      
-//         Serial.print("angle is : ");
-//         Serial.println(angl);
-//        }
-//       break;
-//     default:                      //rest
-//      turnOffMotor(pinNumber1, pinNumber2);
-//      break;
-//    }   
-//    Serial.print("JUMP OUT THE LOOP");
-//    turnOffMotor(pinNumber1, pinNumber2);
-//}
 
-//determine state of arm rotation (for back)
-//int stateOfRotation(int ang, int cvtUserinput){//cvtUserinput means the value of sensor
-//  //0: counterclockwise, 1: clockwise
-//  if(ang < cvtUserinput){
-//    return 0;
-//  }else if(ang > cvtUserinput){
-//    return 1;
-//  }
-//}
