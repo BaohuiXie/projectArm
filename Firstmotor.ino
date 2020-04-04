@@ -1,17 +1,21 @@
-//bicep 校准时sensor(红黄绿，黄绿蓝)调到110， 手臂与shoulder两束对齐， range: 20-200 (0-180)， sensor背对你clockwise为增大角度，红为地线绿为火线
-//shoulder motor 从背面看过去 counterclockwise rotating means shoulder自身角度来说counterclockwise
-//back 初始角度16度，抬手角度增加
-//shoulder 手臂垂直放下时140度，自身来看逆时针转（抬手）角度减少
-//BICEP 初始180，手臂自身顺时针转角度增大，逆时针角度变小
-//elbow 初始角度20度，极限是116度至20度
-//不要输入离极限接近的值会有以下两个问题：1.电源电压不足以提供手臂到达那个位置  2.速度过猛导致越过极限值
+//"back" initial angle value of the sensor is 16. the arm rise means the angle value of the sensor increase
+//"shoulder" initial angle value of the sensor is 140，the arm rise means the angle value of the sensor decrease
+//"BICEP" initial angle value of the sensor is 180，for the arm itself, clockwise rotation means the angle value of the sensor increase
+//elbow initial angle value of the sensor is 20，range must control within the range 116 to 20.
+
+//************For safety do not select a input value that beyong or close to the min&max range******************************//
+//************Otherwise, it will come up with following problem：***********************************************************//
+//************1.the battery bank power supply can not support the arm to reach that position********************************//
+//************2.The angular velocity may break the machanical parts. expectially for the elbow******************************//
+
 //userInput value------------------------------------------------------------------------------------------------------
-int userInBack=0;                  //input range 0-93   尽量取0-55，电压不足
+int userInBack=0;                  //input range 0-93   better select a number between 0-55，
+                        //since the battery can not supply that much power to support the movement
 int userInShoulder=0;            //input range -55 to 110
 int userInBicep=0;                  //INPUT RANGE -40 TO 50
 int userInElbow=20;                //input range 20 to 80
 
-
+//by Baohui
 //convert userInput value to sensor input value----------------------------------------------------------------------------------------------
 int cvtUserInBack=(userInBack+17);                     //input range 17-110
 int cvtUserInShoulder=(140-(userInShoulder));            //input range 30 to 195
@@ -21,19 +25,18 @@ int cvtUserInElbow=(userInElbow+(8*userInElbow/20));       //input range 25 to 1
 
 //---------------------------------------------------------------------------------------------------------------
 //offset range of the sensor (range of each joint)
-
 //back
-int minBack = 17;           //实际 0
-int maxBack = 110;          //93
+int minBack = 17;           //corresponding to the actual value 0 for the arm 
+int maxBack = 110;          //corresponding to the actual value 93 for the arm 
 //shoulder
-int minShoulder = 30;       //实际110
-int maxShoulder = 195;      //-55
+int minShoulder = 30;       //corresponding to the actual value 110 for the arm 
+int maxShoulder = 195;      //corresponding to the actual value -55 for the arm 
   //bicep
-int minBicep = 130;         //实际50
-int maxBicep = 220;         //-40
+int minBicep = 130;         //corresponding to the actual value 50 for the arm 
+int maxBicep = 220;         //corresponding to the actual value -40 for the arm 
   //elbow
-int minElbow =25;           //实际20
-int maxElbow =116;          //80
+int minElbow =25;           //corresponding to the actual value 20 for the arm 
+int maxElbow =116;          //corresponding to the actual value 80 for the arm 
 
 
 //--------------------------------------------------------------------------------------------------
@@ -124,6 +127,7 @@ void setup() {
     Serial.begin(9600); // Set up the serial connection for printing, start communication at 9600 baud
 }
 
+//by Baohui
 void loop() {
 //  //read sensor section
 
@@ -195,7 +199,8 @@ void loop() {
 
 
 //-------------------------------------------------------------------------------------
-//determine state of arm rotation (for shoulder)(FOR BICEP)(FOR ELBOW)
+//by Baohui
+//determine state of arm rotation 
 int stateOfRotation(int ang, int cvtUserinput){//cvtUserinput means the value of sensor
   //0: counterclockwise, 1: clockwise
   if(ang < cvtUserinput){
@@ -206,11 +211,12 @@ int stateOfRotation(int ang, int cvtUserinput){//cvtUserinput means the value of
 }
 
 //---------------------------------------------------------------------------------------------
+//by Baohui
 //opertating the rotation for diferent motor or joint with different case
 void rotationOperator(int roState, int angl, int senValue, int analogInPin, int pinNumber1, 
               int pinNumber2, int enNumber, int enSpeed, int cvtUserIn, int minRange, int maxRange){
    switch (roState){
-    case 0:                                                                                // Counterclockwise (rising)
+    case 0:                                                                                
       while ((angl >= minRange-5) && (angl <= maxRange+5) && (angl >= cvtUserIn)) { 
         senValue = analogRead(analogInPin);
         angl = map(senValue,0,1023,0,240);
@@ -219,7 +225,7 @@ void rotationOperator(int roState, int angl, int senValue, int analogInPin, int 
          Serial.println(angl);
       }
       break;
-    case 1:                                                                                // clockwise (no rising)
+    case 1:                                                                                
       while ((angl >= minRange-5) && (angl <= maxRange+5) && (angl <= cvtUserIn)) { 
         senValue = analogRead(analogInPin);
         angl = map(senValue,0,1023,0,240);
@@ -240,6 +246,7 @@ void rotationOperator(int roState, int angl, int senValue, int analogInPin, int 
 
 
 //--------------------------------------------------------------------------------------
+//by Baohui
 //turn off motors
 void turnOffMotor(int pinNumber1, int pinNumber2){
   digitalWrite(pinNumber1, LOW);
@@ -248,21 +255,24 @@ void turnOffMotor(int pinNumber1, int pinNumber2){
 
 
 //------------------------------------------------------------------------------------------
-//从马达背面看过去(back:RISE)(shoulder:drop)(BICEP:rotate toward shelf(clockwise))(elbow:rise)
+//by Baohui
+//look from the back of the motor
 void clockWiseRotate(int pinNumber1, int pinNumber2, int enNumber, int enSpeed){
   digitalWrite(pinNumber1, LOW);         
   digitalWrite(pinNumber2, HIGH);
   analogWrite(enNumber, enSpeed);
   delay(30);//0.03sec
 }
-
+//(back:RISE)(shoulder:drop)(BICEP:rotate toward shelf(clockwise))(elbow:rise)
 
 
 //------------------------------------------------------------------------------------------
-//从马达背面看过去(back:DROP)(shoulder:rise)(BICEP:rotate leave shelf(counterclockwise))(ELBOW:drop)
+//by Baohui
+//look from the back of the motor
 void counterClockWiseRotate(int pinNumber1, int pinNumber2, int enNumber, int enSpeed){
    digitalWrite(pinNumber1, HIGH);         
    digitalWrite(pinNumber2, LOW);
    analogWrite(enNumber, enSpeed);
    delay(30);//0.03sec
 }
+//(back:DROP)(shoulder:rise)(BICEP:rotate leave shelf(counterclockwise))(ELBOW:drop)
