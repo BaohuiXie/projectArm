@@ -1,4 +1,4 @@
-double count = 0; //设一堆玩意，不知道啥，照着画瓢
+double count = 0; //
 double angle = 0;
 boolean A,B;
 byte state, statep;
